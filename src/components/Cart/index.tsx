@@ -1,5 +1,7 @@
 "use client";
 import React, { useState } from "react";
+import { observer } from "mobx-react-lite";
+import { useCartStore } from "@/context/RootStoreContext";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { ProductItem } from "./Product";
@@ -7,11 +9,6 @@ import { Input } from "../ui/Input";
 import { FormItems } from "../ui/FormItems";
 import { Button } from "../ui/Button";
 import { Alert } from "../ui/Alert";
-
-const data = [
-  { id: 1, title: "Товар 1", count: 3, totalSum: 12345 },
-  { id: 2, title: "Товар 2", count: 44, totalSum: 12345 },
-];
 
 const phoneSchema = yup.object().shape({
   phone: yup
@@ -21,10 +18,13 @@ const phoneSchema = yup.object().shape({
     .required("Обязательное поле"),
 });
 
-export const Cart = () => {
+export const Cart = observer(() => {
+  const cartStore = useCartStore();
   const [successMessageVisible, setSuccessMessageVisible] = useState(false);
   const [submittingError, setSubmittingError] = useState<string | null>(null);
-  const cartTitle = data.length ? "Добавленные товары" : "Корзина пуста";
+  const cartTitle = cartStore.items.length
+    ? "Добавленные товары"
+    : "Корзина пуста";
   const formik = useFormik({
     initialValues: { phone: "" },
     validationSchema: phoneSchema,
@@ -52,12 +52,12 @@ export const Cart = () => {
       <div className="mb-8 p-6 w-fit bg-blue-50 border border-blue-200 rounded-xl shadow-md">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">{cartTitle}</h2>
         <div className="space-y-2 mb-6">
-          {data.map((item) => (
+          {cartStore.items.map((item) => (
             <ProductItem
               key={item.id}
               title={item.title}
-              count={item.count}
-              totalSum={item.totalSum}
+              count={cartStore.itemCount}
+              totalSum={cartStore.total}
             />
           ))}
         </div>
@@ -91,4 +91,4 @@ export const Cart = () => {
       </div>
     </section>
   );
-};
+});

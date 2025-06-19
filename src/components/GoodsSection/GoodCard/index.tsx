@@ -3,21 +3,17 @@ import React, { FC, useState } from "react";
 import { ImageWithFallback } from "@/components/ui/Image";
 import { Button } from "@/components/ui/Button";
 import { QuantityControl } from "../QuantityControl";
+import { useCartStore } from "@/context/RootStoreContext";
+import { Product } from "@/lib/api/goods/model";
+
 interface GoodCardProps {
-  id: number;
-  image_url: string;
-  title: string;
-  description?: string;
-  price?: number;
+  product: Product;
 }
 
-export const GoodCard: FC<GoodCardProps> = ({
-  id,
-  image_url,
-  title,
-  description,
-  price,
-}) => {
+export const GoodCard: FC<GoodCardProps> = ({ product }) => {
+  const { id, title, description, image_url, price } = product;
+  const cartStore = useCartStore();
+  const { addItem, removeItem } = cartStore;
   const [isQuantityVisible, setQuantityVisible] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
 
@@ -44,8 +40,11 @@ export const GoodCard: FC<GoodCardProps> = ({
       </div>
       {isQuantityVisible ? (
         <QuantityControl
+          item={product}
           totalCount={totalCount}
           onChange={handleQuantityChange}
+          onChangeCountUp={addItem}
+          onChangeDown={removeItem}
         />
       ) : (
         <Button

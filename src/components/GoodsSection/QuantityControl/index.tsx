@@ -1,26 +1,37 @@
 "use client";
 import React, { FC, useState } from "react";
+import { Product } from "@/lib/api/goods/model";
+import { CartItem } from "@/store/CartStore";
 
 interface QuantityControlProps {
+  item: Product;
   totalCount: number;
   onChange: (number: number) => void;
+  onChangeCountUp: (item: CartItem) => void;
+  onChangeDown: (id: number) => void;
 }
 
 export const QuantityControl: FC<QuantityControlProps> = ({
+  item,
   totalCount,
   onChange,
+  onChangeCountUp,
+  onChangeDown,
 }) => {
   const [currentCount, setCurrentCount] = useState(totalCount);
   const handleUpCount = () => {
     const newCount = currentCount + 1;
+    const newItem = { ...item, count: newCount } as CartItem;
     setCurrentCount(newCount);
     onChange(newCount);
+    onChangeCountUp(newItem);
   };
 
   const handleDownCount = () => {
     const newCount = currentCount > 0 ? currentCount - 1 : currentCount;
     setCurrentCount(newCount);
     onChange(newCount);
+    onChangeDown(item.id);
   };
 
   return (

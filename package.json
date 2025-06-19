@@ -12,9 +12,13 @@
     "classnames": "^2.5.1",
     "formik": "^2.4.6",
     "lodash": "^4.17.21",
+    "mobx": "^6.13.7",
+    "mobx-react": "^9.2.0",
+    "mobx-react-lite": "^4.1.0",
     "next": "15.3.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-infinite-scroll-component": "^6.1.0",
     "tailwind-merge": "^3.3.1",
     "yup": "^1.6.1"
   },

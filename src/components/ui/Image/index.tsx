@@ -1,4 +1,6 @@
+"use client";
 import Image from "next/image";
+import { useState } from "react";
 
 type ImageWithFallbackProps = {
   src: string;
@@ -10,17 +12,24 @@ type ImageWithFallbackProps = {
 export const ImageWithFallback = ({
   src,
   alt,
-  fallbackSrc = "public/window.svg",
+  fallbackSrc = "/window.svg",
   className,
   ...props
 }: ImageWithFallbackProps) => {
+  const [error, setError] = useState(false);
+
+  const handleError = () => {
+    setError(true);
+  };
+
   return (
     <div className={`relative ${className}`}>
       <Image
-        src={src ? src : fallbackSrc}
+        src={error || !src ? fallbackSrc : src}
         alt={alt}
         fill
         className="object-cover"
+        onError={handleError}
         {...props}
       />
     </div>
