@@ -70,7 +70,7 @@ export const Cart = () => {
                 formik={formik}
                 placeholder="+7 (XXX) XXX-XX-XX"
               />
-              <Button type="submit" disabled={isButtonDisable} className="">
+              <Button type="submit" disabled={isButtonDisable}>
                 Отправить
               </Button>
 
