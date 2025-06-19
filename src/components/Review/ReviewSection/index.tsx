@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { ReviewCard } from "@/components/Review/ReviewCard";
+import { ReviewCardSkeleton } from "@/components/Review/ReviewCardSkeleton";
 import { getReviews } from "@/lib/api/reviews/service";
 import { IReview } from "@/lib/api/reviews/model";
 
@@ -14,16 +15,26 @@ const ReviewsSection = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div>Отзывы уже в пути...</div>;
-
   return (
-    <section className="flex justify-center mb-12">
-      <div className="relative">
-        <div className="flex space-x-4 overflow-x-auto pb-4 scrollbar-hide">
-          {reviews.map((review, index) => (
-            <ReviewCard key={review.id} id={review.id} text={review.text} />
-          ))}
-        </div>
+    <section className="mb-12">
+      <div className="container mx-auto px-4">
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(3)].map((_, index) => (
+              <div className="flex justify-center" key={index}>
+                <ReviewCardSkeleton />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {reviews.map((review) => (
+              <div className="flex justify-center" key={review.id}>
+                <ReviewCard id={review.id} text={review.text} />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
