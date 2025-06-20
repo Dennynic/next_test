@@ -1,31 +1,30 @@
 "use client";
-import React, { FC, useState } from "react";
+import React, { FC } from "react";
+import { observer } from "mobx-react-lite";
 import { ImageWithFallback } from "@/components/ui/Image";
 import { Button } from "@/components/ui/Button";
 import { QuantityControl } from "../QuantityControl";
 import { useCartStore } from "@/context/RootStoreContext";
 import { Product } from "@/lib/api/goods/model";
+import { CartItem } from "@/store/CartStore";
 
 interface GoodCardProps {
   product: Product;
 }
 
-export const GoodCard: FC<GoodCardProps> = ({ product }) => {
+export const GoodCard: FC<GoodCardProps> = observer(({ product }) => {
   const { id, title, description, image_url, price } = product;
   const cartStore = useCartStore();
-  const { addItem, removeItem } = cartStore;
-  const [isQuantityVisible, setQuantityVisible] = useState(false);
-  const [totalCount, setTotalCount] = useState(0);
-
-  const handleQuantityChange = (total: number) => {
-    setTotalCount(total);
-    if (total === 0) setQuantityVisible(false);
-  };
+  const { addItem, removeItem, getItem } = cartStore;
+  const productStore = getItem(id);
+  const isQuantityVisible = !!productStore?.count;
 
   const handleButtonClick = () => {
-    setQuantityVisible(true);
-    setTotalCount(1);
+    const item = getItem(id);
+    const newItem = item ? { ...item } : ({ ...product, count: 0 } as CartItem);
+    addItem(newItem);
   };
+
   return (
     <div className="bg-white border border-gray-200 rounded-xl shadow-md overflow-hidden p-4 flex flex-col items-center">
       <ImageWithFallback
@@ -40,9 +39,7 @@ export const GoodCard: FC<GoodCardProps> = ({ product }) => {
       </div>
       {isQuantityVisible ? (
         <QuantityControl
-          item={product}
-          totalCount={totalCount}
-          onChange={handleQuantityChange}
+          item={productStore}
           onChangeCountUp={addItem}
           onChangeDown={removeItem}
         />
@@ -56,4 +53,4 @@ export const GoodCard: FC<GoodCardProps> = ({ product }) => {
       )}
     </div>
   );
-};
+});

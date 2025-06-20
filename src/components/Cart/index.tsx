@@ -1,20 +1,20 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { useCartStore } from "@/context/RootStoreContext";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import { ProductItem } from "./Product";
-import { Input } from "../ui/Input";
-import { FormItems } from "../ui/FormItems";
-import { Button } from "../ui/Button";
-import { Alert } from "../ui/Alert";
+import { CartProduct } from "./CartProduct";
+
+import { submitOrder } from "@/lib/api/goods/service";
+import { FormCart } from "./FormCart";
 
 const phoneSchema = yup.object().shape({
   phone: yup
     .string()
     .matches(/^\+?[0-9\s\-]+$/, "Номер телефона должен содержать только цифры")
     .min(10, "Слишком короткий номер")
+    .max(12, "Слишком длинный...")
     .required("Обязательное поле"),
 });
 
@@ -22,9 +22,17 @@ export const Cart = observer(() => {
   const cartStore = useCartStore();
   const [successMessageVisible, setSuccessMessageVisible] = useState(false);
   const [submittingError, setSubmittingError] = useState<string | null>(null);
-  const cartTitle = cartStore.items.length
-    ? "Добавленные товары"
-    : "Корзина пуста";
+
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const cartItems = isClient ? cartStore.items : [];
+
+  const cartTitle = cartItems.length ? "Добавленные товары" : "Корзина пуста";
+
   const formik = useFormik({
     initialValues: { phone: "" },
     validationSchema: phoneSchema,
@@ -33,61 +41,70 @@ export const Cart = observer(() => {
     onSubmit: async (values) => {
       try {
         setSubmittingError(null);
-        //request to server
+        const cartItemsForApi = cartItems.map((item) => ({
+          id: Number(item.id),
+          quantity: item.count,
+        }));
+
+        await submitOrder({
+          phone: values.phone,
+          cart: cartItemsForApi,
+        });
+
+        cartStore.clearCart();
+
         formik.resetForm();
         setSuccessMessageVisible(true);
         setTimeout(() => {
           setSuccessMessageVisible(false);
         }, 3000);
       } catch (err: any) {
-        setSubmittingError(err.message);
+        setSubmittingError(err.msg);
       }
     },
   });
 
-  const isButtonDisable = !formik.isValid || !formik.values["phone"];
+  const isButtonDisable =
+    !formik.isValid || !formik.values["phone"] || !cartItems.length;
+
+  //   if (!isClient) {
+  //     return (
+  //       <section className="flex justify-center">
+  //         <div className="mb-8 p-6 w-fit bg-blue-50 border border-blue-200 rounded-xl shadow-md">
+  //           <h2 className="text-2xl font-bold text-gray-800 mb-4">{cartTitle}</h2>
+  //           <div className="space-y-2 mb-6" />
+  //         </div>
+  //       </section>
+  //     );
+  //   }
 
   return (
     <section className="flex justify-center">
       <div className="mb-8 p-6 w-fit bg-blue-50 border border-blue-200 rounded-xl shadow-md">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">{cartTitle}</h2>
         <div className="space-y-2 mb-6">
-          {cartStore.items.map((item) => (
-            <ProductItem
-              key={item.id}
-              title={item.title}
-              count={cartStore.itemCount}
-              totalSum={cartStore.total}
-            />
-          ))}
-        </div>
-        <div className="flex flex-col sm:flex-row gap-4 items-center">
-          <form onSubmit={formik.handleSubmit}>
-            <FormItems>
-              <Input
-                name="phone"
-                type="tel"
-                formik={formik}
-                placeholder="+7 (XXX) XXX-XX-XX"
-              />
-              <Button type="submit" disabled={isButtonDisable}>
-                Отправить
-              </Button>
+          {isClient &&
+            cartItems.length &&
+            cartItems.map((item) => {
+              const totalSum = item.count * item.price;
 
-              <div>
-                {!formik.isValid && !!formik.submitCount && (
-                  <Alert color="red">Ошибка при отправке</Alert>
-                )}
-                {submittingError && (
-                  <Alert color="red">{submittingError}</Alert>
-                )}
-                {successMessageVisible && (
-                  <Alert color="green">Заказ отправлен</Alert>
-                )}
-              </div>
-            </FormItems>
-          </form>
+              return (
+                <CartProduct
+                  key={item.id}
+                  title={item.title}
+                  count={item.count}
+                  totalSum={totalSum}
+                />
+              );
+            })}
         </div>
+
+        <FormCart
+          isButtonDisable={isButtonDisable}
+          formik={formik}
+          successMessageVisible={successMessageVisible}
+          submittingError={submittingError}
+        />
       </div>
     </section>
   );

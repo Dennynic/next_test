@@ -12,7 +12,7 @@ type ImageWithFallbackProps = {
 export const ImageWithFallback = ({
   src,
   alt,
-  fallbackSrc = "/window.svg",
+  fallbackSrc = "/default.jpg",
   className,
   ...props
 }: ImageWithFallbackProps) => {

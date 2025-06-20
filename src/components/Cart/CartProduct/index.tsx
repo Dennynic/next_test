@@ -6,7 +6,7 @@ type ProductProps = {
   totalSum: number;
 };
 
-export const ProductItem: FC<ProductProps> = ({ title, count, totalSum }) => {
+export const CartProduct: FC<ProductProps> = ({ title, count, totalSum }) => {
   return (
     <div className="flex items-center justify-between text-lg text-gray-700">
       <span>
