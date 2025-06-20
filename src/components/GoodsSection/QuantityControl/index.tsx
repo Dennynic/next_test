@@ -1,5 +1,4 @@
-"use client";
-import React, { FC, useState } from "react";
+import React, { FC } from "react";
 import { CartItem } from "@/store/CartStore";
 
 interface QuantityControlProps {

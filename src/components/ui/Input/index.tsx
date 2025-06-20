@@ -1,26 +1,25 @@
 "use client";
-
-import React, { FC, useRef, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import { FormikProps } from "formik";
 import { debounce } from "lodash";
 
-interface InputProps {
+interface InputProps<T extends Record<string, string>> {
   type: string;
   placeholder?: string;
   name: string;
   label?: string;
-  formik: FormikProps<any>;
+  formik: FormikProps<T>;
   onValueChange?: (name: string, value: string) => void;
 }
 
-export const Input: FC<InputProps> = ({
+export const Input = <T extends Record<string, string>>({
   type,
   placeholder,
   name,
   label,
   formik,
   onValueChange,
-}) => {
+}: InputProps<T>) => {
   const value = formik.values[name];
   const error = formik.errors[name] as string | undefined;
   const isDisabled = formik.isSubmitting;
@@ -34,8 +33,9 @@ export const Input: FC<InputProps> = ({
   );
 
   useEffect(() => {
+    const debouncedValidate = debouncedValidateRef.current;
     return () => {
-      debouncedValidateRef.current.cancel();
+      debouncedValidate.cancel();
     };
   }, []);
 
