@@ -13,7 +13,10 @@ export const ReviewCard: FC<ReviewCardProps> = ({ id, text }) => {
           <span className="text-blue-600 font-bold">Отзыв {id}</span>
         </div>
       </div>
-      <div className="" dangerouslySetInnerHTML={{ __html: text }}></div>
+      <div
+        className="text-gray-800"
+        dangerouslySetInnerHTML={{ __html: text }}
+      ></div>
     </div>
   );
 };

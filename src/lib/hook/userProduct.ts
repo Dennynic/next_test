@@ -1,15 +1,15 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { getProducts } from "@/lib/api/goods/service";
-//import { GetProductsResponse } from "@/lib/api/goods/model";
 import { Product } from "@/lib/api/goods/model";
 
 export const useProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [page, setPage] = useState(1);
+  const pageRef = useRef(1); // Используем ref вместо state для page
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isInitialFetchDone, setIsInitialFetchDone] = useState(false);
 
   const loadMore = useCallback(async () => {
     if (isLoading || !hasMore) return;
@@ -18,20 +18,29 @@ export const useProducts = () => {
     setError(null);
 
     try {
-      const data = await getProducts({ page });
-      setProducts((prev) => [...prev, ...data.items]);
+      const data = await getProducts({ page: pageRef.current });
+
+      setProducts((prev) => {
+        const newItems = data.items.filter(
+          (newItem) => !prev.some((item) => item.id === newItem.id)
+        );
+        return [...prev, ...newItems];
+      });
       setHasMore(data.page * data.amount < data.total);
-      setPage((prev) => prev + 1);
+      pageRef.current += 1;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Неизвестная ошибка");
     } finally {
       setIsLoading(false);
     }
-  }, [page, isLoading, hasMore]);
+  }, [isLoading, hasMore]);
 
   useEffect(() => {
-    loadMore();
-  }, []);
+    if (!isInitialFetchDone) {
+      loadMore();
+      setIsInitialFetchDone(true);
+    }
+  }, [isInitialFetchDone]);
 
   return { products, loadMore, hasMore, isLoading, error };
 };
