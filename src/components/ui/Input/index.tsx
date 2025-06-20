@@ -10,6 +10,7 @@ interface InputProps {
   name: string;
   label?: string;
   formik: FormikProps<any>;
+  onValueChange?: (name: string, value: string) => void;
 }
 
 export const Input: FC<InputProps> = ({
@@ -18,6 +19,7 @@ export const Input: FC<InputProps> = ({
   name,
   label,
   formik,
+  onValueChange,
 }) => {
   const value = formik.values[name];
   const error = formik.errors[name] as string | undefined;
@@ -27,6 +29,7 @@ export const Input: FC<InputProps> = ({
   const debouncedValidateRef = useRef(
     debounce((fieldName: string, fieldValue: string) => {
       formik.setFieldValue(fieldName, fieldValue, true);
+      onValueChange?.(fieldName, fieldValue);
     }, 300)
   );
 
@@ -46,7 +49,9 @@ export const Input: FC<InputProps> = ({
 
   const handleBlur = () => {
     formik.setFieldTouched(name, true, true);
+    onValueChange?.(name, value);
   };
+
   return (
     <div className="w-full">
       {label && !isInvalid && (

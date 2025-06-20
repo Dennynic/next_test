@@ -30,3 +30,4 @@ export const useRootStore = (): TRootStore => {
 };
 
 export const useCartStore = () => useRootStore().cartStore;
+export const useFormStore = () => useRootStore().formStore;
