@@ -10,6 +10,7 @@ interface FormCartProps {
   formik: FormikProps<any>;
   submittingError?: string | null;
   successMessageVisible?: boolean;
+  handleInputChange: (name: string, value: string) => void;
 }
 
 export const FormCart: FC<FormCartProps> = ({
@@ -17,6 +18,7 @@ export const FormCart: FC<FormCartProps> = ({
   formik,
   submittingError,
   successMessageVisible,
+  handleInputChange,
 }) => {
   return (
     <form onSubmit={formik.handleSubmit}>
@@ -27,6 +29,7 @@ export const FormCart: FC<FormCartProps> = ({
             type="tel"
             formik={formik}
             placeholder="+7 (XXX) XXX-XX-XX"
+            onValueChange={handleInputChange}
           />
         </div>
 

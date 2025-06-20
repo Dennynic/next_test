@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
-import { useCartStore } from "@/context/RootStoreContext";
+import { useCartStore, useFormStore } from "@/context/RootStoreContext";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { CartProduct } from "./CartProduct";
@@ -20,6 +20,7 @@ const phoneSchema = yup.object().shape({
 
 export const Cart = observer(() => {
   const cartStore = useCartStore();
+  const formStore = useFormStore();
   const [successMessageVisible, setSuccessMessageVisible] = useState(false);
   const [submittingError, setSubmittingError] = useState<string | null>(null);
 
@@ -30,11 +31,11 @@ export const Cart = observer(() => {
   }, []);
 
   const cartItems = isClient ? cartStore.items : [];
-
   const cartTitle = cartItems.length ? "Добавленные товары" : "Корзина пуста";
+  const { phoneNumber } = formStore;
 
   const formik = useFormik({
-    initialValues: { phone: "" },
+    initialValues: { phone: phoneNumber || "" },
     validationSchema: phoneSchema,
     validateOnChange: true,
     validateOnBlur: true,
@@ -52,8 +53,12 @@ export const Cart = observer(() => {
         });
 
         cartStore.clearCart();
+        formStore.clear();
 
-        formik.resetForm();
+        formik.resetForm({
+          values: { phone: "" },
+        });
+
         setSuccessMessageVisible(true);
         setTimeout(() => {
           setSuccessMessageVisible(false);
@@ -64,19 +69,14 @@ export const Cart = observer(() => {
     },
   });
 
+  const handleInputChange = (name: string, value: string) => {
+    if (name === "phone") {
+      formStore.setPhone(value);
+    }
+  };
+
   const isButtonDisable =
     !formik.isValid || !formik.values["phone"] || !cartItems.length;
-
-  //   if (!isClient) {
-  //     return (
-  //       <section className="flex justify-center">
-  //         <div className="mb-8 p-6 w-fit bg-blue-50 border border-blue-200 rounded-xl shadow-md">
-  //           <h2 className="text-2xl font-bold text-gray-800 mb-4">{cartTitle}</h2>
-  //           <div className="space-y-2 mb-6" />
-  //         </div>
-  //       </section>
-  //     );
-  //   }
 
   return (
     <section className="flex justify-center">
@@ -104,6 +104,7 @@ export const Cart = observer(() => {
           formik={formik}
           successMessageVisible={successMessageVisible}
           submittingError={submittingError}
+          handleInputChange={handleInputChange}
         />
       </div>
     </section>
