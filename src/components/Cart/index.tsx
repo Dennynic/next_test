@@ -9,6 +9,11 @@ import { CartProduct } from "./CartProduct";
 import { submitOrder } from "@/lib/api/goods/service";
 import { FormCart } from "./FormCart";
 
+interface ApiError extends Error {
+  message: string;
+  status?: number;
+}
+
 const phoneSchema = yup.object().shape({
   phone: yup
     .string()
@@ -63,8 +68,11 @@ export const Cart = observer(() => {
         setTimeout(() => {
           setSuccessMessageVisible(false);
         }, 3000);
-      } catch (err: any) {
-        setSubmittingError(err.msg);
+      } catch (error) {
+        const apiError = error as ApiError;
+        setSubmittingError(
+          apiError.message || "Произошла ошибка при отправке заказа"
+        );
       }
     },
   });

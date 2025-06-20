@@ -9,7 +9,7 @@ const DynamicInfiniteScroll = dynamic(
 );
 
 export const GoodSection = () => {
-  const { products, loadMore, hasMore, isLoading, error } = useProducts();
+  const { products, loadMore, hasMore, error } = useProducts();
   return (
     <div className="container mx-auto p-4 md:p-8 bg-white shadow-lg rounded-2xl max-w-6xl">
       <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">

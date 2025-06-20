@@ -40,7 +40,7 @@ export const useProducts = () => {
       loadMore();
       setIsInitialFetchDone(true);
     }
-  }, [isInitialFetchDone]);
+  }, [isInitialFetchDone, loadMore]);
 
   return { products, loadMore, hasMore, isLoading, error };
 };

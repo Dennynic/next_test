@@ -5,9 +5,13 @@ import { FormItems } from "@/components/ui/FormItems";
 import { Button } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
 
+interface FormValues {
+  phone: string;
+  [key: string]: string;
+}
 interface FormCartProps {
   isButtonDisable: boolean;
-  formik: FormikProps<any>;
+  formik: FormikProps<FormValues>;
   submittingError?: string | null;
   successMessageVisible?: boolean;
   handleInputChange: (name: string, value: string) => void;

@@ -9,7 +9,6 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 export const Button: FC<ButtonProps> = ({
   children,
-  customProps,
   disabled,
   customClassName = "",
   ...rest

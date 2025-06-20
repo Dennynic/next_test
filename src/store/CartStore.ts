@@ -39,8 +39,8 @@ export class CartStore {
     try {
       const data = localStorage.getItem(CART_STORAGE_KEY);
       if (data) {
-        const parsed = JSON.parse(data);
-        this.items = parsed.map((item: any) => ({
+        const parsed = JSON.parse(data) as Array<Partial<CartItem>>;
+        this.items = parsed.map((item) => ({
           id: Number(item.id),
           title: String(item.title),
           price: Number(item.price),
